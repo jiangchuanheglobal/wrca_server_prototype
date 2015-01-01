@@ -41,7 +41,7 @@ class ResidentModel
             return false;
         }
 
-        $query = "SELECT * FROM resident WHERE email=$email";
+        $query = "SELECT * FROM resident WHERE email='$email'";
         $result = mysql_query($query);
         if (mysql_num_rows($result) == 0) {
             return false;
@@ -53,7 +53,7 @@ class ResidentModel
             return false;
         }
 
-        $query = "SELECT * FROM resident WHERE email = $email";
+        $query = "SELECT * FROM resident WHERE email = '$email'";
         $result = mysql_query($query);
         return mysql_fetch_assoc($result);
     }

@@ -93,7 +93,9 @@ class Controller {
         
         $row = $residentModel->get_row_by_email($email);
         require_once './email.php';
-        $result = Email::send($email, 'WRCA app verification code', $row['verification_code']);
+        $result = Email::send($email, 
+            "WRCA app verification code", 
+            "Hi, this is your WRCA verification code#". $row['verification_code']);
         if (!$result) {
             $response = array('success' => 0, 'message' => 'send email fail.');
             echo json_encode($response);
