@@ -2,8 +2,9 @@
 # email operation helper
 
 class Email {
-    public static function send($email_address, $content) {
-
+    public static function send($to, $subject, $message) {
+        $headers = "From: jiangchuanheglobal@gmail.com" . "\r\n";
+        return mail($to,$subject,$message,$headers); 
     }
 }
 ?>

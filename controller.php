@@ -7,10 +7,69 @@ class controller {
     private static final field_verification_code = 'verification_code';
     // methods
 
-    public static router() {
+    public static function dispatch_get() {
+        if (!isset($_GET['object'])) {
+            $response = array('success' => 0, 'message' => 'get object value not set'); 
+            echo json_encode($response);
+            return;
+        }
+        switch ($_GET['object']) {
+            case 'verificationCode':
+                controller::on_request_verification_code($_GET['email']);
+                break;
+            case 'events':
+                controller::on_request_events();
+                break;
+            default:
+               $response = array('success' => 0, 'message' => 'get object not support');  
+               echo json_encode($response);
+        }
+    }
+    public static function dispatch_post() {
+        if (!isset($_POST['object'])) {
+            $response = array('success' => 0, 'message' => 'post object value not set'); 
+            echo json_encode($response);
+            return;
+        }
+        switch ($_POST['object']) {
+        case 'register':
+            controller::on_register($_POST['email'], $_POST['password'], $_POST['verificationCode']);
+            break;
+        case 'login':
+            controller::on_login($_POST['email'], $_POST['password']);
+            break;
+        default:
+            $response = array('success' => 0, 'message' => 'post object not support');  
+            echo json_encode($response);
+        }
+    }
+    public static function dispatch_put() {
 
     }
-    public static function on_requst_verification_code($email) {
+    public static function dispatch_delete() {
+
+    }
+    public static function route() {
+        switch ($_SERVER['REQUEST_METHOD']) {
+        case 'GET':
+            controller::dispatch_get();
+            break;
+        case 'POST':
+            controller::dispatch_post();
+            break;
+        case 'PUT':
+            controller::dispatch_put();
+            break;
+        case 'DELETE':
+            controller::dispatch_delete();
+            break;
+        default:
+            $response = array('success' => 0, 'message' => 'request method not support.'); 
+            echo json_encode($response);
+            return;
+        } 
+    }
+    public static function on_request_verification_code($email) {
         $residentModel = new ResidentModel();
         $result = $residentModel->create_connection();
         if (!$result) {
@@ -27,7 +86,8 @@ class controller {
             return;
         }
         
-        $result = Email::send($email, $content);
+        $row = $residentModel->get_row_by_email($email);
+        $result = Email::send($email, 'WRCA app verification code', $row['verification_code']);
         if (!$result) {
             $response = array('success' => 0, 'message' => 'send email fail.');
             echo json_encode($response);
@@ -78,7 +138,6 @@ class controller {
             $response = array('success' => 0, 'message' => 'create connect failed'); 
             echo json_encode($response);
             return;
-
         }
         $result = $userModel->contains_email($email);
         if (!$result) {
