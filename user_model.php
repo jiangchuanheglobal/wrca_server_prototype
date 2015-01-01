@@ -38,7 +38,7 @@ class UserModel {
             return false;
         }
 
-        $query = "INSERT INTO user (id, email, password, token) VALUES (default, $email, $password,  $token)"
+        $query = "INSERT INTO user (id, email, password, token) VALUES (default, $email, $password,  $token)";
         $result = mysql_db_query($query);
         if (!$result) {
             return false;

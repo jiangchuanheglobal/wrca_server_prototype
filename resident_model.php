@@ -1,61 +1,60 @@
 <?php
 # handle resident table operation
 
-class ResidentModel {
+class ResidentModel 
+{
     // properties
-    private $link_identifier = '';
+    private $link_identifier=''; 
 
-    private $server = 'localhost';
-    private $username = 'root';
+    public $server = 'localhost';
+    private $username = '';
     private $password = '';
 
     private $database_name = 'test';
-    
+
     // methods
+
+    public function get_error() {
+        return mysql_error();
+    }
     public function create_connection() {
-        $link_identifier = mysql_connect($server, $username, $password);
-        if (!$link_identifier) {
-            echo mysql_error();
+        $this->link_identifier = mysql_connect($this->server, $this->username, $this->password);
+        if (!$this->link_identifier) {
             return false;
         }
-        $result = mysql_select_db($database_name, $link_identifier);
+        $result = mysql_select_db('test', $this->link_identifier);
         if (!$result) {
-            echo 'select db error';
             return false;
         }
         return true;
     }
     public function destroy_connection() {
-        if (!$link_identifier) {
+        if (!$this->link_identifier) {
             return;
         }
-        mysql_close($link_identifier);
+        mysql_close($this->link_identifier);
     }
     
     public function contains_email($email) {
-        if (!$link_identifier) {
+        if (!isset($this->link_identifier)) {
+            echo 'err';
             return false;
         }
 
-        $query = "SELECT * FROM resident WHERE email='$email'";
-        $result = mysql_db_query($query);
-
+        $query = "SELECT * FROM resident WHERE email=$email";
+        $result = mysql_query($query);
         if (mysql_num_rows($result) == 0) {
             return false;
         }
         return true;
     }
     public function get_row_by_email($email) {
-        if (!$link_identifier) {
+        if (!$this->link_identifier) {
             return false;
         }
 
         $query = "SELECT * FROM resident WHERE email = $email";
-        $result = mysql_db_query($query);
-        if (!$result) {
-            return NULL;
-        }
-
+        $result = mysql_query($query);
         return mysql_fetch_assoc($result);
     }
 

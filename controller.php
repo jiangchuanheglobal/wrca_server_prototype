@@ -1,15 +1,15 @@
 <?php
 # router, business logic
 
-class controller {
+class Controller {
 
     // properties
-    private static final field_verification_code = 'verification_code';
+    //private static final $field_verification_code = 'verification_code';
     // methods
 
     public static function dispatch_get() {
         if (!isset($_GET['object'])) {
-            $response = array('success' => 0, 'message' => 'get object value not set'); 
+            $response = array('success' => 0, 'message' => 'get, object value not set'); 
             echo json_encode($response);
             return;
         }
@@ -21,7 +21,7 @@ class controller {
                 controller::on_request_events();
                 break;
             default:
-               $response = array('success' => 0, 'message' => 'get object not support');  
+               $response = array('success' => 0, 'message' => 'get, object type not support');  
                echo json_encode($response);
         }
     }
@@ -66,16 +66,21 @@ class controller {
         default:
             $response = array('success' => 0, 'message' => 'request method not support.'); 
             echo json_encode($response);
-            return;
         } 
     }
     public static function on_request_verification_code($email) {
+        if (empty($email)) {
+            $response = array('success' => 0, 'message' => 'email value is empty'); 
+            echo json_encode($response);
+            return;
+        }
+        require_once './resident_model.php';
         $residentModel = new ResidentModel();
         $result = $residentModel->create_connection();
         if (!$result) {
-            $response = array('success' => 0, 'message' => 'create connection failed.');
+            $response = array('success' => 0, 'message' => $residentModel->get_error());
             echo json_encode($response);
-            return 
+            return; 
         }
         
         $result = $residentModel->contains_email($email);
@@ -87,6 +92,7 @@ class controller {
         }
         
         $row = $residentModel->get_row_by_email($email);
+        require_once './email.php';
         $result = Email::send($email, 'WRCA app verification code', $row['verification_code']);
         if (!$result) {
             $response = array('success' => 0, 'message' => 'send email fail.');
@@ -99,13 +105,15 @@ class controller {
         $residentModel->destroy_connection();
     }
     public static function on_register($email, $password, $verification_code) {
+        require_once './resident_model.php';
+        require_once './user_model.php';
         $residentModel = new ResidentModel();
         if (!$result) {
             $response = array('success' => 0, 'message' => 'create connection failed.');
             echo json_encode($response);
             return; 
         }
-        $result = residentModel->contains_email($email);
+        $result = $residentModel->contains_email($email);
         $row = $residentModel->get_row_by_email($email);
         if ($row["verification_code"] != $verification_code) {
             $response = array('success' => 0, 'message' => 'verification code not match.'); 
@@ -132,6 +140,7 @@ class controller {
         $residentModel->destroy_connection();
     }
     public static function on_login($email, $password) {
+        require_once './user_model.php';
         $userModel = new UserModel();
         $result = $userModel->create_connection();
         if (!$result) {
@@ -160,6 +169,7 @@ class controller {
         $userMode->destroy_connection();
     }
     public static function on_retrieve_password($email) {
+        require_once './user_model.php';
         $userMode = new UserModel();
         $result = $userModel->create_connection();
         if (!$result) {
@@ -183,7 +193,8 @@ class controller {
     }
 
     public static function on_request_events() {
-        
+        $response = array('success' => 0, 'message' => 'events method is not implemented.');  
+        echo json_encode($response);
     }
 
 }
