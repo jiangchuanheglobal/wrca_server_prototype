@@ -15,10 +15,13 @@ class Controller {
         }
         switch ($_GET['object']) {
             case 'verificationCode':
-                controller::on_request_verification_code($_GET['email']);
+                Controller::on_request_verification_code($_GET['email']);
+                break;
+            case 'password':
+                Controller::on_retrieve_password($_GET['email']);
                 break;
             case 'events':
-                controller::on_request_events();
+                Controller::on_request_events();
                 break;
             default:
                $response = array('success' => 0, 'message' => 'get, object type not support');  
@@ -203,7 +206,7 @@ class Controller {
     }
     public static function on_retrieve_password($email) {
         require_once './user_model.php';
-        $userMode = new UserModel();
+        $userModel = new UserModel();
         $result = $userModel->create_connection();
         if (!$result) {
             $response = array('success' => 0, 'message' => 'create connect failed'); 
@@ -215,14 +218,19 @@ class Controller {
         if (!$result) {
             $response = array('success' => 0, 'message' => 'cannot find email'); 
             echo json_encode($response);
-            $residentModel->destroy_connection();
+            $userModel->destroy_connection();
             return; 
         } 
-        $row = $userMode->get_row_by_email($email);
-        Email::send($email, $row["password"]);
+
+        // send email containing password
+        require_once './email.php';
+        $row = $userModel->get_row_by_email($email);
+        Email::send($email, 
+            "WRCA app verification code",
+            "Hi, this your password" . $row["password"]);
         $response = array('success' => 1, 'message' => 'please check your email box'); 
         echo json_encode($response);
-        $residentModel->destroy_connection();
+        $userModel->destroy_connection();
     }
 
     public static function on_request_events() {
