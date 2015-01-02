@@ -6,23 +6,18 @@ class ResidentModel
     // properties
     private $link_identifier=''; 
 
-    public $server = 'localhost';
-    private $username = '';
-    private $password = '';
-
-    private $database_name = 'test';
-
     // methods
-
     public function get_error() {
         return mysql_error();
     }
     public function create_connection() {
-        $this->link_identifier = mysql_connect($this->server, $this->username, $this->password);
+        require_once './config.php';
+        $this->link_identifier = mysql_connect(Config::$server, Config::$username, Config::$password);
+
         if (!$this->link_identifier) {
             return false;
         }
-        $result = mysql_select_db('test', $this->link_identifier);
+        $result = mysql_select_db(Config::$database, $this->link_identifier);
         if (!$result) {
             return false;
         }
@@ -33,6 +28,7 @@ class ResidentModel
             return;
         }
         mysql_close($this->link_identifier);
+        $this->link_identifier = '';
     }
     
     public function contains_email($email) {
@@ -57,6 +53,5 @@ class ResidentModel
         $result = mysql_query($query);
         return mysql_fetch_assoc($result);
     }
-
 }
 ?>

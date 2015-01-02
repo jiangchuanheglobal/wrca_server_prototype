@@ -1,8 +1,10 @@
 <?php
 # global constant config file
-$server = 'localhost';
-$username = 'root';
-$password = '';
-$database_name = 'wrca';
 
+class Config {
+    public static $server = 'localhost';
+    public static $username = '';
+    public static $password = '';
+    public static $database = 'test';
+}
 ?>

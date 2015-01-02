@@ -110,12 +110,18 @@ class Controller {
         require_once './resident_model.php';
         require_once './user_model.php';
         $residentModel = new ResidentModel();
+        $result = $residentModel->create_connection();
         if (!$result) {
-            $response = array('success' => 0, 'message' => 'create connection failed.');
+            $response = array('success' => 0, 'message' => $residentModel->get_error());
             echo json_encode($response);
             return; 
         }
         $result = $residentModel->contains_email($email);
+        if (!$result) {
+            $response = array('success' => 0, 'message' => 'cannot find email');
+            echo json_encode($response);
+            return;
+        }
         $row = $residentModel->get_row_by_email($email);
         if ($row["verification_code"] != $verification_code) {
             $response = array('success' => 0, 'message' => 'verification code not match.'); 
@@ -124,22 +130,40 @@ class Controller {
             return;
         }
 
-        $userMode = new UserModel();
+        $residentModel->destroy_connection(); // email & verification code ok.
+
+        $userModel = new UserModel();
+        $result = $userModel->create_connection();
+        if (!$result) {
+            $response = array('success' => 0, 'message' => 'create connection failed.' . $userModel->get_error());
+            echo json_encode($response);
+            return;
+        }
+
+        // already register ?
+        $result = $userModel->contains_email($email);
+        if ($result) {
+            $response = array('success' => 0, 'message' => 'already registered!');
+            echo json_encode($response);
+            return;
+        }
         //$hash = Utility::hash_SSHA($password);
         //$encrypted_password = $hash["encrypted"]; // encrypted password
         //$salt = $hash["salt"]; // salt
+
+
+        // let's insert
         $token = bin2hex(openssl_random_pseudo_bytes(16));
-        $result = $userMode->insert_row($email, $password, $token);
+        $result = $userModel->insert_row($email, $password, $token);
         if (!$result) {
-            $response = array('success' => 0, 'message' => 'insert row error.'); 
+            $response = array('success' => 0, 'message' => $userModel->get_error()); 
             echo json_encode($response);
-            $residentModel->destroy_connection();
+            $userModel->destroy_connection();
             return;
-            
         }
         $response = array('success' => 1, 'message' => 'register ok.'); 
         echo json_encode($response);
-        $residentModel->destroy_connection();
+        $user_model->destroy_connection();
     }
     public static function on_login($email, $password) {
         require_once './user_model.php';
@@ -152,23 +176,30 @@ class Controller {
         }
         $result = $userModel->contains_email($email);
         if (!$result) {
-            $response = array('success' => 0, 'message' => 'cannot find email'); 
+            $response = array('success' => 0, 'message' => 'user not exist'); 
             echo json_encode($response);
-            $residentModel->destroy_connection();
+            $userModel->destroy_connection();
             return;
         }
-        $row = $userMode->get_row_by_email($email);
+        $row = $userModel->get_row_by_email($email);
         if ($row["password"] != $password) {
             $response = array('success' => 0, 'message' => 'password not match'); 
             echo json_encode($response);
-            $residentModel->destroy_connection();
+            $userModel->destroy_connection();
             return;
         }
+
+        // let's update token
         $token = bin2hex(openssl_random_pseudo_bytes(16));
-        $userMode->update_row($email. $password, $token);
-        $response = array('success' => 1, 'message' => 'login ok', 'token' => '$token'); 
+        $result = $userModel->update_row($email, $password, $token);
+        if (!$result) {
+            $response = array('success' => 0, 'message' => $userModel->get_error()); 
+            echo json_encode($response);
+            return;
+        }
+        $response = array('success' => 1, 'message' => 'login ok', 'token' => "$token"); 
         echo json_encode($response);
-        $userMode->destroy_connection();
+        $userModel->destroy_connection();
     }
     public static function on_retrieve_password($email) {
         require_once './user_model.php';
