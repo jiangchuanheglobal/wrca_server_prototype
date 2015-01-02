@@ -226,8 +226,8 @@ class Controller {
         require_once './email.php';
         $row = $userModel->get_row_by_email($email);
         Email::send($email, 
-            "WRCA app verification code",
-            "Hi, this your password" . $row["password"]);
+            "WRCA app retrieve password",
+            "Hi, this your password#" . $row["password"]);
         $response = array('success' => 1, 'message' => 'please check your email box'); 
         echo json_encode($response);
         $userModel->destroy_connection();
