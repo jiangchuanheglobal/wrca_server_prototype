@@ -234,8 +234,29 @@ class Controller {
     }
 
     public static function on_request_events() {
-        $response = array('success' => 0, 'message' => 'events method is not implemented.');  
+        if (!$_GET['type'] || !$_GET['cursorPos']) {
+            $response = array('success' => 0, 'message' => 'params value not set'); 
+            echo json_encode($response);
+            return;
+        }
+        require_once './event_model.php';
+        $eventModel = new EventModel();
+        $result = $eventModel->create_connection();
+        if (!$result) {
+            $response = array('success' => 0, 'message' => 'create connect failed'); 
+            echo json_encode($response);
+            return;
+        }
+
+        switch ($_GET['type']) {
+        case 'all':
+            $response = $eventModel->get_rows_by_id_range($_GET['cursorPos'], $_GET['cursorPos']+5); 
+            break;
+        case 'today':
+            break;
+        } 
         echo json_encode($response);
+        $eventModel->destroy_connection();
     }
 
 }

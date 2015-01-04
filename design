@@ -1,0 +1,20 @@
+request 
+
+dispatch request based on method
+
+continue dispatch request based on resource type
+
+call handler 
+
+handler process request, major business logic happens here
+
+
+source tree
+-----------
+- config
+- controller
+- utility
+- email
+- resident_model
+- user_model
+- index
