@@ -250,7 +250,13 @@ class Controller {
 
         switch ($_GET['type']) {
         case 'all':
-            $response = $eventModel->get_rows_by_id_range($_GET['cursorPos'], $_GET['cursorPos']+5); 
+            $rows = $eventModel->get_rows_by_id_range($_GET['cursorPos'], $_GET['cursorPos']+5); 
+            if ($rows) {
+                $response['success'] = 1;
+                $response['events'] = $rows;
+            } else {
+                $response['success'] = 0;
+            }
             break;
         case 'today':
             break;
