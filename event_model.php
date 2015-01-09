@@ -8,6 +8,7 @@ class EventModel {
         if (!$this->link_identifier) {
             return false;
         }
+        mysql_set_charset("utf8", $this->link_identifier); // json_encode requires the string to be utf8
         $result = mysql_select_db(Config::$database, $this->link_identifier);
         if (!$result) {
             return false;

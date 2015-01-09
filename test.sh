@@ -15,5 +15,5 @@
 #curl "http://localhost/proj/index?object=events&type=all&cursorPos=1"
 #curl "http://jiangchuan.info/php/index.php?object=events&type=all&cursorPos=25"
 
-#curl "http://localhost/proj/index?object=events&type=week&cursorPos=1"
-curl "http://localhost/proj/index?object=events&type=month&cursorPos=1"
+curl "http://localhost/proj/index?object=events&type=week&cursorPos=1"
+#curl "http://localhost/proj/index?object=events&type=month&cursorPos=1"
