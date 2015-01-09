@@ -234,7 +234,7 @@ class Controller {
     }
 
     public static function on_request_events() {
-        if (!$_GET['type'] || !$_GET['cursorPos']) {
+        if (!$_GET['type']) {
             $response = array('success' => 0, 'message' => 'params value not set'); 
             echo json_encode($response);
             return;
@@ -251,7 +251,12 @@ class Controller {
 
         switch ($_GET['type']) {
         case 'all':
-            $rows = $eventModel->get_rows_by_id_range($_GET['cursorPos'], $_GET['cursorPos']+5); 
+            if (!$_GET['offset']) {
+                $response = array('success' => 0, 'message' => 'param: offset [value] not set'); 
+                echo json_encode($response);
+                return;
+            }
+            $rows = $eventModel->get_rows_by_id_range($_GET['offset'], $_GET['offset']+5); 
             if ($rows) {
                 $response['success'] = 1;
                 $response['events'] = $rows;
