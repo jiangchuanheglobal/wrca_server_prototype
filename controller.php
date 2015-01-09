@@ -240,7 +240,7 @@ class Controller {
             return;
         }
         require_once './event_model.php';
-        require_once './Utility.php';
+        require_once './utility.php';
         $eventModel = new EventModel();
         $result = $eventModel->create_connection();
         if (!$result) {
