@@ -240,6 +240,7 @@ class Controller {
             return;
         }
         require_once './event_model.php';
+        require_once './Utility.php';
         $eventModel = new EventModel();
         $result = $eventModel->create_connection();
         if (!$result) {
@@ -258,8 +259,33 @@ class Controller {
                 $response['success'] = 0;
             }
             break;
-        case 'today':
+        case 'week':
+            $range = Utility::get_date_range_of_this_week();
+            //echo $range['start'];
+            //echo "\t";
+            //echo $range['end'];
+            //echo "\t";
+            $rows = $eventModel->get_rows_by_date_range($range['start'], $range['end']);
+            if ($rows) {
+                $response['success']  = 1;
+                $response['events'] = $rows;
+            } else {
+                $response['success'] = 0;
+            }
             break;
+        case 'month':
+            $range = Utility::get_date_range_of_this_month();
+            $rows = $eventModel->get_rows_by_date_range($range['start'], $range['end']);
+            if ($rows) {
+                $response['success']  = 1;
+                $response['events'] = $rows;
+            } else {
+                $response['success'] = 0;
+            }
+            break;
+        default:
+            $response['success'] = 0;
+            $response['message'] = "type not support";
         } 
         echo json_encode($response);
         $eventModel->destroy_connection();

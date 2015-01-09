@@ -66,6 +66,24 @@ class EventModel {
         return $arr;
     }
 
+    public function get_rows_by_date_range($start, $end) {
+        if ($start > $end) {
+            return false;
+        }
+        if (!$this->link_identifier) {
+            return false;
+        }
+        $query = "SELECT * FROM event WHERE time BETWEEN '$start' AND '$end'";
+        $result = mysql_query($query, $this->link_identifier);
+        if (!$result) {
+            return false;
+        }
+        while ($row = mysql_fetch_assoc($result)) {
+            $arr[] = $row;
+        }
+        return $arr;
+
+    }
     public function get_error() {
        return mysql_error(); 
     }
