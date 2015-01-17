@@ -1,0 +1,1 @@
+INSERT INTO `test`.`nearby` (`id`, `name`, `thumbnail_url`, `address`, `lat`, `lon`, `open_hours`, `category`, `introduction`) VALUES ('1', 'recreation center', 'http://png-5.findicons.com/files/icons/1963/colorcons_blue/128/questionmark.png', '382 JoeMccarthy Dr, Amherst', '43.014435', ' -78.821328', '9:00 am - 5:00 pm', 'recreation', 'a good place to go');
